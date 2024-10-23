@@ -1,0 +1,58 @@
+import ipaddress
+
+def get_ip_class(ip):
+    first_octet = int(ip.split('.')[0])
+    if 1 <= first_octet <= 126:
+        return 'A'
+    elif 128 <= first_octet <= 191:
+        return 'B'
+    elif 192 <= first_octet <= 223:
+        return 'C'
+    elif 224 <= first_octet <= 239:
+        return 'D (Multicast)'
+    elif 240 <= first_octet <= 255:
+        return 'E (Reserved)'
+    else:
+        return 'Invalid IP Class'
+
+def default_subnet_mask(ip_class):
+    masks = {'A': '255.0.0.0', 'B': '255.255.0.0', 'C': '255.255.255.0'}
+    return masks.get(ip_class, 'N/A')
+
+def network_and_broadcast_id(ip, subnet_mask):
+    net = ipaddress.IPv4Network(f'{ip}/{subnet_mask}', strict=False)
+    return net.network_address, net.broadcast_address
+
+def limited_broadcast_address():
+    return '255.255.255.255'
+
+def directed_broadcast_address(network_id, subnet_mask):
+    net = ipaddress.IPv4Network(f'{network_id}/{subnet_mask}', strict=False)
+    return net.broadcast_address
+
+def main():
+    ip = input("Enter an IP address: ")
+    ip_class = get_ip_class(ip)
+    
+    print(f"IP Class: {ip_class}")
+    
+    subnet_mask = default_subnet_mask(ip_class)
+    
+print(f"Default Subnet Mask: {subnet_mask}")
+    
+    if subnet_mask != 'N/A':
+        network_id, broadcast_id = network_and_broadcast_id(ip, subnet_mask)
+        print(f"Network ID: {network_id}")
+        print(f"Broadcast ID: {broadcast_id}")
+        
+        print(f"Limited Broadcast Address: {limited_broadcast_address()}")
+
+
+        print(f"Directed Broadcast Address: {directed_broadcast_address(network_id, subnet_mask)}")
+    else:
+        print("Invalid IP class or address.")
+
+if _name_ == "_main_":
+    main()
+
+
